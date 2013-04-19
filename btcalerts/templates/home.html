@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load bootstrap_toolkit %}
+{% block title %}
+Chaos Lord
+{% endblock %}
+
+{% block body%}
+{% if user.is_authenticated %}
+<div class="span10 offset1">
+<h3>Your Active Alerts</h3>
+</div>
+<div class="span5">
+  <form class="form-signin" action="/alert/" method="post">
+    <h2 class="form-signin-heading">Request New Alert</h2>
+      {% csrf_token %}
+    {% if alert_succeeded %}
+    You have created a new alert.
+    {% endif %}
+    {% if alert_failed %}
+    Your new alert failed to be created.
+    {% endif %}
+    {{ form|as_bootstrap }}
+    <button type="submit" class="btn">Request Alert</button>
+</div>
+{% else %}
+      <div class="jumbotron">
+        <h1>Real-Time Bitcoin Alerts</h1>
+        <p class="lead">Receive an e-mail or text message when the price of Bitcoin rises above or falls below a certain threshold!</p>
+        <a class="btn btn-large btn-success" href="/register/">Set up your alert now!</a>
+      </div>
+
+      <hr>
+      <div class="row-fluid marketing">
+{% endif %}
+	<!--        <div class="span6">
+          <h4>Subheading</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+          <h4>Subheading</h4>
+          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+          <h4>Subheading</h4>
+          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        </div>
+
+        <div class="span6">
+          <h4>Subheading</h4>
+          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+          <h4>Subheading</h4>
+          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+
+          <h4>Subheading</h4>
+          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        </div>
+-->
+{% endblock %}
