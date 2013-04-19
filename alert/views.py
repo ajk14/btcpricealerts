@@ -21,7 +21,7 @@ def alert(request):
                    'alert_when' : request.POST['alert_when'], 
                    'user_id' : str(request.user)}
         print payload
-        r = requests.post("http://198.211.103.89:9292/alerts", data=payload)
+        r = requests.post("http://198.211.103.89:9876/alerts", data=payload)
         print r
         if r.status_code == requests.codes.ok:
             context['alert_succeeded'] = True
