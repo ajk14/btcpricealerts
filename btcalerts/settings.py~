@@ -4,7 +4,7 @@ import os.path
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-AUTH_USER_MODEL = 'alert.MyUser'
+AUTH_USER_MODEL = 'alert.AUser'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
