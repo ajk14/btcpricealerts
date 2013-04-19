@@ -63,7 +63,7 @@ def register(request):
             user = authenticate(username=request.POST["email"], password=request.POST["password"])
             if user is not None:
                 login(request, user)
-            return redirect("/")    
+                return redirect("/")    
             #return render_to_response("home.html", context, context_instance=RequestContext(request))
             else:
                 print "Error logging in message"
