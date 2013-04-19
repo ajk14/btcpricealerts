@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.conf import settings
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -12,6 +13,8 @@ urlpatterns = patterns('',
     #url(r'^login/$','django.contrib.auth.views.login', {'template_name': 'home.html'}, name="login"), 
     url(r'^login/$','alert.views.myLogin', name="myLogin"), 
     url(r'^alert/$','alert.views.alert'),
+    url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+    
     # url(r'^btcalerts/', include('btcalerts.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
