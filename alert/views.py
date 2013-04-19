@@ -2,12 +2,20 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from alert.models import RegistrationForm, AUser, AlertForm
 from django.contrib.auth import authenticate, login 
+from django.contrib import messages
 import requests
+import ast
 
 def home(request):
     context = {}
     form = AlertForm()
     context['form'] = form
+    payload = {'user_id' : request.user}
+    r = requests.get("http://198.211.103.89:9876/alerts", data=payload)
+    alertList = ast.literal_eval(r.content)
+    context['myAlerts'] = alertList
+    for alert in alertList:
+        print alert['alert_when']
     return render_to_response("home.html", context, context_instance=RequestContext(request))
 
 def alert(request):
@@ -24,10 +32,10 @@ def alert(request):
         r = requests.post("http://198.211.103.89:9876/alerts", data=payload)
         print r
         if r.status_code == requests.codes.ok:
-            context['alert_succeeded'] = True
+            messages.add_message(request, messages.INFO, 'You added an alert successfully.')
         else:
-            context['alert_failed'] = True
-    return render_to_response("home.html", context, context_instance=RequestContext(request))
+            messages.add_message(request, messages.INFO, 'You failed to createyour alert. Please try again later.')
+    return redirect("/") 
 
 def myLogin(request):
     context = {}

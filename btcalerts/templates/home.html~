@@ -19,30 +19,8 @@ Chaos Lord
     {% if alert_failed %}
     Your new alert failed to be created.
     {% endif %}
-{{ form|as_bootstrap }}
-      <button type="submit" class="btn">Request Alert</button>
-<!--
-      <label class="radio">
-	<input type="radio" name="delivery_type" value="SMS">Text Message
-      </label>
-      <label class="radio">
-	<input type="radio" name="delivery_type" value="EMAIL">E-mail
-      </label>
-      <label>Phone:</label>
-      <input class="input-block-level" type="text" name="destination" placeholder="###-###-####">
-      <label> Alert me when Price goes:</label>
-      <label class="radio">
-	<input type="radio" name="alert_when" value="OVER">above<br>
-      </label>
-      <label class="radio">
-	<input type="radio" name="alert_when" value="UNDER">below<br>
-      </label>
-      <label>Price:</label>
-      <input class="input-block-level" type="text" name="threshold" placeholder="Price (USD)">
-      <input type="hidden" name="user_id" value="{{user}}">
-      <button type="submit" class="btn">Request Alert</button>
-    </form>
--->
+    {{ form|as_bootstrap }}
+    <button type="submit" class="btn">Request Alert</button>
 </div>
 {% else %}
       <div class="jumbotron">

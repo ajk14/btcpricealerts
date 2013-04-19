@@ -24,6 +24,10 @@ DATABASES = {
 }
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOCAL_MACHINE = True
+if BASE_DIR != "/Users/andykaier/Documents/btcalerts/btcalerts":
+    print BASE_DIR
+    LOCAL_MACHINE = False
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -164,8 +168,9 @@ LOGGING = {
 }
 
 # Parse database configuration from $DATABASE_URL
-import dj_database_url
-DATABASES['default'] =  dj_database_url.config()
+if not LOCAL_MACHINE:
+    import dj_database_url
+    DATABASES['default'] =  dj_database_url.config()
 
-# Honor the 'X-Forwarded-Proto' header for request.is_secure()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # Honor the 'X-Forwarded-Proto' header for request.is_secure()
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

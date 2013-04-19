@@ -8,11 +8,25 @@ Chaos Lord
 {% if user.is_authenticated %}
 <div class="span10 offset1">
 <h3>Your Active Alerts</h3>
+{% for alert in myAlerts %}
+<div>
+  {% for k,v in alert.items %}
+  {{k}} : {{v}}
+  {% endfor %}
+</div>
+{% endfor %}
 </div>
 <div class="span5">
   <form class="form-signin" action="/alert/" method="post">
     <h2 class="form-signin-heading">Request New Alert</h2>
       {% csrf_token %}
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <div>{{ message }}</div>
+      {% endfor %}
+    </ul>
+{% endif %}
     {% if alert_succeeded %}
     You have created a new alert.
     {% endif %}
