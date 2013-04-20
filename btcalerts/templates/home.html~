@@ -26,8 +26,8 @@ Chaos Lord
   {{v}}
   </td>
   {% endfor %}
-  <td><a href="/edit?{{alert.id}}"><i class="icon-edit"></i></a></td>
-  <td><a href="/delete?{{alert.id}}"><i class="icon-trash"></i></a></td>
+  <td><a href="/edit?id={{alert.id}}"><i class="icon-edit"></i></a></td>
+  <td><a href="/delete?id={{alert.id}}"><i class="icon-trash"></i></a></td>
 </tr>
 {% endfor %}
 </table>
