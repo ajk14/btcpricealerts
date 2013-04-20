@@ -8,13 +8,14 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 DELIVERY_CHOICES = [('SMS', 'Text Message'), ('Email', 'E-mail')]
+ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
 
 class AlertForm(Form):
     delivery_type = ChoiceField(choices=DELIVERY_CHOICES, widget=RadioSelect())
-    destination = USPhoneNumberField()
+    phone = USPhoneNumberField()
+    alert_when = ChoiceField(choices=ALERT_CHOICES, widget=RadioSelect())
     threshold = IntegerField()
-    alert_when = CharField(max_length=100)
- 
+    
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None):
         if not email:

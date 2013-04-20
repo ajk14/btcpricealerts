@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
-DELIVERY_CHOICES = [('SMS', 'Text Message'), ('Email', 'E-mail')]
+DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
 ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
 
 class AlertForm(Form):

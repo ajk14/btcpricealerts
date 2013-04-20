@@ -8,13 +8,29 @@ Chaos Lord
 {% if user.is_authenticated %}
 <div class="span10 offset1">
 <h3>Your Active Alerts</h3>
+<table class="table">
+<tr>
+  <td><strong>Alert Type</strong></td>
+  <td><strong>E-mail</strong></td>
+  <td><strong>Phone</strong></td>
+  <td><strong>Alert When</strong></td>
+  <td><strong>Threshold</strong></td>
+  <td><strong>ID</strong></td>
+  <td><strong>Edit</strong></td>
+  <td><strong>Delete</strong></td>
+</tr>
 {% for alert in myAlerts %}
-<div>
+<tr>
   {% for k,v in alert.items %}
-  {{k}} : {{v}}
+  <td>
+  {{v}}
+  </td>
   {% endfor %}
-</div>
+  <td><a href="/edit?id={{alert.id}}"><i class="icon-edit"></i></a></td>
+  <td><a href="/delete?id={{alert.id}}"><i class="icon-trash"></i></a></td>
+</tr>
 {% endfor %}
+</table>
 </div>
 <div class="span5">
   <form class="form-signin" action="/alert/" method="post">

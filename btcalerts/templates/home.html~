@@ -8,11 +8,41 @@ Chaos Lord
 {% if user.is_authenticated %}
 <div class="span10 offset1">
 <h3>Your Active Alerts</h3>
+<table class="table">
+<tr>
+  <td><strong>Alert Type</strong></td>
+  <td><strong>E-mail</strong></td>
+  <td><strong>Phone</strong></td>
+  <td><strong>Alert When</strong></td>
+  <td><strong>Threshold</strong></td>
+  <td><strong>ID</strong></td>
+  <td><strong>Edit</strong></td>
+  <td><strong>Delete</strong></td>
+</tr>
+{% for alert in myAlerts %}
+<tr>
+  {% for k,v in alert.items %}
+  <td>
+  {{v}}
+  </td>
+  {% endfor %}
+  <td><a href="/edit?{{alert.id}}"><i class="icon-edit"></i></a></td>
+  <td><a href="/delete?{{alert.id}}"><i class="icon-trash"></i></a></td>
+</tr>
+{% endfor %}
+</table>
 </div>
 <div class="span5">
   <form class="form-signin" action="/alert/" method="post">
     <h2 class="form-signin-heading">Request New Alert</h2>
       {% csrf_token %}
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <div>{{ message }}</div>
+      {% endfor %}
+    </ul>
+{% endif %}
     {% if alert_succeeded %}
     You have created a new alert.
     {% endif %}

@@ -4,19 +4,33 @@ from alert.models import RegistrationForm, AUser, AlertForm
 from django.contrib.auth import authenticate, login 
 from django.contrib import messages
 import requests
-import ast
+import json
+
+REQUEST_URL = "http://alerts.btcpricealerts.com:9876/"
 
 def home(request):
     context = {}
     form = AlertForm()
     context['form'] = form
     payload = {'user_id' : request.user}
-    r = requests.get("http://198.211.103.89:9876/alerts", data=payload)
-    alertList = ast.literal_eval(r.content)
-    context['myAlerts'] = alertList
-    for alert in alertList:
+    r = requests.get(REQUEST_URL + "alerts", data=payload)
+    print r.status_code
+    print r.content
+    alertList = json.loads(r.content)
+    print alertList
+    context['myAlerts'] = alertList['alerts']
+    for alert in alertList['alerts']:
         print alert['alert_when']
     return render_to_response("home.html", context, context_instance=RequestContext(request))
+
+def delete(request):
+    context = {}
+    id = request.GET['id']
+    url = REQUEST_URL + "alerts/" + id
+    r = requests.delete(url)
+    print r.status_code
+    return redirect("/")
+
 
 def alert(request):
     context = {}
@@ -29,7 +43,7 @@ def alert(request):
                    'alert_when' : request.POST['alert_when'], 
                    'user_id' : str(request.user)}
         print payload
-        r = requests.post("http://198.211.103.89:9876/alerts", data=payload)
+        r = requests.post(REQUEST_URL + "alerts", data=payload)
         print r
         if r.status_code == requests.codes.ok:
             messages.add_message(request, messages.INFO, 'You added an alert successfully.')
