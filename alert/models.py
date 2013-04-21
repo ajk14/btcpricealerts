@@ -1,5 +1,5 @@
 from django.db import models
-from django.forms import ModelForm, IntegerField, EmailField, CharField, PasswordInput, ValidationError, Form, ChoiceField, RadioSelect
+from django.forms import ModelForm, FloatField, EmailField, CharField, PasswordInput, ValidationError, Form, ChoiceField, RadioSelect
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.localflavor.us.forms import USPhoneNumberField
 from django.db.models.signals import post_save
@@ -14,7 +14,7 @@ class AlertForm(Form):
     delivery_type = ChoiceField(choices=DELIVERY_CHOICES, widget=RadioSelect())
     phone = USPhoneNumberField()
     alert_when = ChoiceField(choices=ALERT_CHOICES, widget=RadioSelect())
-    threshold = IntegerField()
+    threshold = FloatField()
     
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None):

@@ -1,5 +1,5 @@
 from django.db import models
-from django.forms import ModelForm, IntegerField, EmailField, CharField, PasswordInput, ValidationError, Form, ChoiceField, RadioSelect
+from django.forms import ModelForm, DoubleField, EmailField, CharField, PasswordInput, ValidationError, Form, ChoiceField, RadioSelect
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.localflavor.us.forms import USPhoneNumberField
 from django.db.models.signals import post_save
@@ -7,14 +7,14 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
-DELIVERY_CHOICES = [('SMS', 'Text Message'), ('Email', 'E-mail')]
+DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
 ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
 
 class AlertForm(Form):
     delivery_type = ChoiceField(choices=DELIVERY_CHOICES, widget=RadioSelect())
     phone = USPhoneNumberField()
     alert_when = ChoiceField(choices=ALERT_CHOICES, widget=RadioSelect())
-    threshold = IntegerField()
+    threshold = DoubleField()
     
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None):
