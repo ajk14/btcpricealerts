@@ -4,15 +4,15 @@
 Chaos Lord
 {% endblock %}
 
-{% block body%}
+{% block content%}
 {% if user.is_authenticated %}
 <div class="span10 offset1">
 <h3>Your Active Alerts</h3>
 <table class="table">
 <tr>
   <td><strong>Alert Type</strong></td>
-  <td><strong>E-mail</strong></td>
-  <td><strong>Phone</strong></td>
+  <td><strong>User</strong></td>
+  <td><strong>Alert Destination</strong></td>
   <td><strong>Alert When</strong></td>
   <td><strong>Threshold</strong></td>
   <td><strong>ID</strong></td>
@@ -56,7 +56,7 @@ Chaos Lord
       <div class="jumbotron">
         <h1>Real-Time Bitcoin Alerts</h1>
         <p class="lead">Receive an e-mail or text message when the price of Bitcoin rises above or falls below a certain threshold!</p>
-        <a class="btn btn-large btn-success" href="/register/">Set up your alert now!</a>
+        <a class="btn btn-large btn-success" href="/accounts/register/">Set up your alert now!</a>
       </div>
 
       <hr>

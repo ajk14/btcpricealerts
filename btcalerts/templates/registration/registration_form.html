@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load bootstrap_toolkit %}
+{% block title %}Register for an account{% endblock %}
+{% block content %}
+    <form class="form-signin" method='post' action=''>{% csrf_token %}
+        {{ form|as_bootstrap }}
+      <button class="btn btn-large btn-primary" type="submit">Send Activation E-mail</button>
+    </form>
+{% endblock %}

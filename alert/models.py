@@ -6,6 +6,8 @@ from django.db.models.signals import post_save
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.core.mail import send_mail
+import datetime
 
 DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
 ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
@@ -17,7 +19,7 @@ class AlertForm(Form):
     threshold = FloatField()
     
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, is_active=True):
         if not email:
             raise ValueError('Users must have an email address')
  
@@ -25,6 +27,8 @@ class MyUserManager(BaseUserManager):
             email=MyUserManager.normalize_email(email),
         )
  
+        #user.is_active = False
+        user.date_joined = datetime.datetime.now() 
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -44,6 +48,7 @@ class AUser(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     objects = MyUserManager()
+    date_joined = models.DateTimeField()
 
     USERNAME_FIELD = 'email'
  
@@ -64,6 +69,12 @@ class AUser(AbstractBaseUser):
  
     def has_module_perms(self, app_label):
         # Handle whether the user has permissions to view the app `app_label`?"
+        return True
+    
+    def email_user(self, subject, message, from_address):
+        print "Sending email now"
+        print message
+        send_mail(subject, message, from_address, [self.email], fail_silently=False)
         return True
  
     @property

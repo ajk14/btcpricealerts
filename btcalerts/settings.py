@@ -38,6 +38,16 @@ if BASE_DIR != "/Users/andykaier/Documents/btcalerts/btcalerts":
 # system time zone.
 TIME_ZONE = 'America/Chicago'
 
+# E-mail activation settings
+EMAIL_HOST_USER = os.environ['SENDGRID_USER']
+EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
+EMAIL_HOST= 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+ACCOUNT_ACTIVATION_DAYS = 2
+DEFAULT_FROM_EMAIL = 'registration@btcpricealerts.com'
+LOGIN_REDIRECT_URL = '/'
+
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
@@ -132,10 +142,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'alert',
     'bootstrap_toolkit',
+    'registration',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 )
 
 # A sample logging configuration. The only tangible logging

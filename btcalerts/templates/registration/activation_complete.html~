@@ -1,0 +1,7 @@
+{% extends "registration/registration_base.html" %}
+{% block title %}Activation complete{% endblock %}
+{% block content %}
+Thanks, activation complete! Please login above using the e-mail and password you set at registration.
+{% endblock %}
+
+

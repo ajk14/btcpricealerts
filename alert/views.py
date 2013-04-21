@@ -81,7 +81,7 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             m = AUser.objects
-            m.create_user(request.POST["email"], request.POST["password"])
+            m.create_user(request.POST["email"], request.POST["password"], is_active=False)
             user = authenticate(username=request.POST["email"], password=request.POST["password"])
             login(request, user)
             return redirect("/")    
