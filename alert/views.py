@@ -9,6 +9,8 @@ import json
 REQUEST_URL = "http://alerts.btcpricealerts.com:9876/alerts"
 ALERT_SUCCESS = "You've created a new alert!"
 ALERT_FAILURE = "Your alert failed to be created. Please try again later."
+MAX_OUTSTANDING_ALERTS = 10
+MAX_ALERTS_EXCEEDED = "Sorry, you can't create more than " + str(MAX_OUTSTANDING_ALERTS) + " alerts."
 
 def loadAlerts(user):
     payload = {'user_id' : user}
@@ -41,6 +43,9 @@ def alert(request):
     form = AlertForm(request.POST)
     context['form'] = form
     if form.is_valid():
+        if len(loadAlerts(request.user)) >= MAX_OUTSTANDING_ALERTS:
+            messages.error(request, MAX_ALERTS_EXCEEDED)
+            return redirect("/")
         if request.POST['delivery_type'] == 'SMS':
             destination = request.POST['phone']
         else:
@@ -53,9 +58,9 @@ def alert(request):
         try:
             r = requests.post(REQUEST_URL, data=payload)
         except requests.RequestException:
-            messages.add_message(request, messages.INFO, ALERT_FAILURE)
+            messages.error(request, ALERT_FAILURE)
             return redirect("/")
-        messages.add_message(request, messages.INFO, ALERT_SUCCESS)
+        messages.success(request, ALERT_SUCCESS)
     else:
         context['myAlerts'] = loadAlerts(request.user)
         return render_to_response("home.html", context, context_instance=RequestContext(request))

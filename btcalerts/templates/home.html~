@@ -6,6 +6,7 @@ Chaos Lord
 
 {% block content%}
 {% if user.is_authenticated %}
+{% if user.is_active %}
 <div class="span10 offset1">
 <h3>Your Active Alerts</h3>
 <table class="table">
@@ -39,10 +40,13 @@ Chaos Lord
     {% if messages %}
     <ul class="messages">
       {% for message in messages %}
-      <div>{{ message }}</div>
-      {% endfor %}
+      {% if message.tags == 'error' %}     
+      <p class="text-error">{{message}}</p>
+      {% else %}
+      <p class="text-success">{{message}}</p>
+      {% endif %}
     </ul>
-{% endif %}
+    {% endif %}
     {% if alert_succeeded %}
     You have created a new alert.
     {% endif %}
@@ -53,6 +57,13 @@ Chaos Lord
     <button type="submit" class="btn">Request Alert</button>
 </div>
 {% else %}
+<div class="span 11 offset1">
+<p class="lead">
+Your account has not yet been activated. Please check your email and click on the link to activate your account.
+</p>
+</div>
+{% endif %}
+{% else %}
       <div class="jumbotron">
         <h1>Real-Time Bitcoin Alerts</h1>
         <p class="lead">Receive an e-mail or text message when the price of Bitcoin rises above or falls below a certain threshold!</p>
@@ -62,6 +73,7 @@ Chaos Lord
       <hr>
       <div class="row-fluid marketing">
 {% endif %}
+
 	<!--        <div class="span6">
           <h4>Subheading</h4>
           <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>

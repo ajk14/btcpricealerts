@@ -40,7 +40,11 @@ Chaos Lord
     {% if messages %}
     <ul class="messages">
       {% for message in messages %}
-      <div>{{ message }}</div>
+        {% if message.tags == 'error' %}     
+        <p class="text-error">{{message}}</p>
+	{% else %}
+        <p class="text-success">{{message}}</p>
+        {% endif %}
       {% endfor %}
     </ul>
     {% endif %}
