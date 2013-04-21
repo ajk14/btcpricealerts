@@ -29,7 +29,7 @@ def home(request):
 def delete(request):
     context = {}
     id = request.GET['id']
-    url = REQUEST_URL + id
+    url = REQUEST_URL + "/" + id
     try:
         r = requests.delete(url)
     except requests.RequestException:
