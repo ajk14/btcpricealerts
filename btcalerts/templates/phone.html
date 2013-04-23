@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load bootstrap_toolkit %}
+{% block title %}
+Confirm your phone number
+{% endblock %}
+
+{% block content%}
+      <form class="form-signin" action="" method="post">
+	{% csrf_token %}
+        <h2 class="form-signin-heading">Verify your Phone Number</h2>
+        {{ form|as_bootstrap }}
+        <button class="btn btn-large btn-primary" type="submit">Send Verification Text</button>
+      </form>
+{% endblock %}

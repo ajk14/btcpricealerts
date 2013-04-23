@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load bootstrap_toolkit %}
+{% block title %}
+Confirm your phone number
+{% endblock %}
+
+{% block content%}
+      <form class="form-signin" action="" method="post">
+	{% csrf_token %}
+        <h2 class="form-signin-heading">Enter your verification code</h2>
+	{% if confirmation_failed %}
+	
+	{% endif %}
+	<div class="control-group required">
+          <div class="controls">
+            <input id="id_confirmation" name="confirmation" type="text"/>
+          </div>
+        </div>
+        <button class="btn btn-large btn-primary" type="submit">Confirm</button>
+      </form>
+{% endblock %}

@@ -38,6 +38,14 @@ if BASE_DIR != "/Users/andykaier/Documents/btcalerts/btcalerts":
 # system time zone.
 TIME_ZONE = 'America/Chicago'
 
+
+SECRET_KEY_SIGN = os.environ['SECRET_KEY_SIGN']
+
+# Twilio settings 
+TWILIO_SID = os.environ['TWILIO_SID']
+TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
+TWILIO_NUMBER = os.environ['TWILIO_NUMBER']
+
 # E-mail activation settings
 EMAIL_HOST_USER = os.environ['SENDGRID_USER']
 EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']

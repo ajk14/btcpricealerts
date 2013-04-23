@@ -36,6 +36,7 @@ Chaos Lord
 <div class="span5">
   <form class="form-signin" action="/alert/" method="post">
     <h2 class="form-signin-heading">Request New Alert</h2>
+    <p><a href="/phone/"> Add a phone number for SMS alerts </a></p>
       {% csrf_token %}
     {% if messages %}
     <ul class="messages">
@@ -54,6 +55,9 @@ Chaos Lord
     {% if alert_failed %}
     Your new alert failed to be created.
     {% endif %}
+
+    <div id="email_field">E-mail: {{user.email}}</div>
+    <div id="phone_field">Phone: {{user.phone}}</div>
     {{ form|as_bootstrap }}
     <button type="submit" class="btn">Request Alert</button>
 </div>

@@ -12,9 +12,11 @@ import datetime
 DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
 ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
 
+class PhoneForm(Form):
+    phone = USPhoneNumberField()
+
 class AlertForm(Form):
     delivery_type = ChoiceField(choices=DELIVERY_CHOICES, widget=RadioSelect())
-    phone = USPhoneNumberField()
     alert_when = ChoiceField(choices=ALERT_CHOICES, widget=RadioSelect())
     threshold = FloatField()
     
@@ -44,12 +46,13 @@ class MyUserManager(BaseUserManager):
  
 class AUser(AbstractBaseUser):        
     email = models.EmailField(max_length=254, unique=True, db_index=True)
-    phone = USPhoneNumberField()
+    phone = models.CharField(max_length=20)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     objects = MyUserManager()
     date_joined = models.DateTimeField()
-
+    phone_is_active = models.BooleanField(default=False)
+    phone_activation_code = models.IntegerField(null=True)
     USERNAME_FIELD = 'email'
  
     def get_full_name(self):

@@ -38,6 +38,11 @@ if BASE_DIR != "/Users/andykaier/Documents/btcalerts/btcalerts":
 # system time zone.
 TIME_ZONE = 'America/Chicago'
 
+# Twilio settings 
+TWILIO_SID = os.environ['TWILIO_SID']
+TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
+TWILIO_NUMBER = os.environ['TWILIO_NUMBER']
+
 # E-mail activation settings
 EMAIL_HOST_USER = os.environ['SENDGRID_USER']
 EMAIL_HOST_PASSWORD = os.environ['SENDGRID_PASSWORD']
@@ -144,9 +149,9 @@ INSTALLED_APPS = (
     'bootstrap_toolkit',
     'registration',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+    'django.contrib.admindocs',
 )
 
 # A sample logging configuration. The only tangible logging
