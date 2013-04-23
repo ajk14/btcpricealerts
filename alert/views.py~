@@ -119,6 +119,13 @@ def alert(request):
     context['phone_number'] = str(request.user.phone)
     print "PHONE: "+ request.user.phone
     if form.is_valid():
+        # Ensure phone number verified if type = SMS
+        if request.POST['delivery_type'] == 'SMS':
+            if not request.user.phone:
+                print "PHONE UNPROVIDED"
+                context['phone_unprovided'] = True
+                context['myAlerts'] = loadAlerts(request.user)
+                return render_to_response("home.html", context, context_instance=RequestContext(request))
         if len(loadAlerts(request.user)) >= MAX_OUTSTANDING_ALERTS:
             messages.error(request, MAX_ALERTS_EXCEEDED)
             return redirect("/")
@@ -135,7 +142,7 @@ def alert(request):
    
         signature = createSignature("POST", REQUEST_EXTENSION, json.dumps(payload))
         try:
-            r = requests.post(REQUEST_URL + REQUEST_EXTENSION, data=json.dumps(payload), headers={'X-Signature':signature, 'Content-Type':'application/json'})
+            r = requests.post(REQUEST_URL + REQUEST_EXTENSION, json.dumps(payload), headers={'X-Signature':signature})
             print r.status_code
             print r.content
         except requests.RequestException:

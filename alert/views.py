@@ -140,9 +140,9 @@ def alert(request):
                    'alert_when' : str(request.POST['alert_when']), 
                    'user_id' : str(request.user)}
    
-        signature = createSignature("POST", REQUEST_EXTENSION, json.dumps(payload))
+        signature = createSignature("POST", REQUEST_EXTENSION, "?" + urlencode(payload))
         try:
-            r = requests.post(REQUEST_URL + REQUEST_EXTENSION, json.dumps(payload), headers={'X-Signature':signature})
+            r = requests.post(REQUEST_URL + REQUEST_EXTENSION, params=payload, headers={'X-Signature':signature})
             print r.status_code
             print r.content
         except requests.RequestException:
