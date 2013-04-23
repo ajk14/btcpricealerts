@@ -8,9 +8,18 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 import datetime
+import phonenumbers
+from django import template
+
+register = template.Library()
 
 DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
 ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
+
+
+@register.filter(name='phonenumber')
+def phonenumber(value, country=None):
+   return phonenumbers.parse(value, country)
 
 class PhoneForm(Form):
     phone = USPhoneNumberField()

@@ -10,9 +10,10 @@ import requests
 import json
 from hashlib import sha1
 import hmac
+from urllib import urlencode
 
-REQUEST_URL = "http://alerts.btcpricealerts.com:9876/"
-REQUEST_EXTENSTION = "alerts"
+REQUEST_URL = "http://alerts.btcpricealerts.com:9876"
+REQUEST_EXTENSION = "/alerts"
 ALERT_SUCCESS = "You've created a new alert!"
 ALERT_FAILURE = "Your alert failed to be created. Please try again later."
 MAX_OUTSTANDING_ALERTS = 10
@@ -64,7 +65,7 @@ def phone(request):
 
 def createSignature(method, path, body):
     message = method+path+body
-    hashed = hmac.new(TEST_KEY, message, sha1)
+    hashed = hmac.new(SECRET_KEY, message, sha1)
     print "--------------"
     print message
     print hashed.hexdigest()
@@ -75,16 +76,18 @@ def isValidSignature (method, path, body, signature):
     return createSignature(method,path,body) == signature
 
 def loadAlerts(user):
-    payload = {"user_id" : str(user)}
-    signature = createSignature("GET", REQUEST_EXTENSION, json.dumps(payload))
+    payload = {}
+    payload["user_id"] = str(user)
+    signVal = "?" + urlencode(payload)
+    signature = createSignature("GET", REQUEST_EXTENSION, signVal)
     try:
-        r = requests.get(REQUEST_URL + REQUEST_EXTENSION, data=payload, headers={'X-Signature':signature})
+        r = requests.get(REQUEST_URL + REQUEST_EXTENSION, params=payload, headers={'X-Signature':signature})
     except requests.RequestException:
         print "error"
         return None
     #print r.headers
     if "X-Signature" in r.headers:
-        if not isValidSignature("GET", REQUEST_URL, str(r.content), r.headers["X-Signature"]):
+        if not isValidSignature("GET", REQUEST_EXTENSION, str(r.content), r.headers["X-Signature"]):
             print "Signature failed to validate, ignore"
             return None
     alertList = json.loads(r.content)
@@ -100,8 +103,9 @@ def home(request):
 def delete(request):
     context = {}
     id = request.GET['id']
-    url = REQUEST_URL + "/" + id
-    signature = createSignature("DELETE", url, "")
+    urlExt = REQUEST_EXTENSION + "/" + id
+    url = REQUEST_URL + urlExt
+    signature = createSignature("DELETE", urlExt, "")
     try:
         r = requests.delete(url, headers={'X-Signature':signature})
     except requests.RequestException:
@@ -128,9 +132,12 @@ def alert(request):
                    'threshold' : str(request.POST['threshold']), 
                    'alert_when' : str(request.POST['alert_when']), 
                    'user_id' : str(request.user)}
-        signature = createSignature("POST", REQUEST_URL, json.dumps(payload))
+   
+        signature = createSignature("POST", REQUEST_EXTENSION, json.dumps(payload))
         try:
-            r = requests.post(REQUEST_URL, data=payload, headers={'X-Signature':signature})
+            r = requests.post(REQUEST_URL + REQUEST_EXTENSION, data=json.dumps(payload), headers={'X-Signature':signature, 'Content-Type':'application/json'})
+            print r.status_code
+            print r.content
         except requests.RequestException:
             messages.error(request, ALERT_FAILURE)
             return redirect("/")

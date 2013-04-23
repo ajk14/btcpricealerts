@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load bootstrap_toolkit %}
 {% block title %}
-Chaos Lord
+Bitcoin Price Alerts
 {% endblock %}
 
 {% block content%}
@@ -57,7 +57,7 @@ Chaos Lord
     {% endif %}
 
     <div id="email_field">E-mail: {{user.email}}</div>
-    <div id="phone_field">Phone: {{phone_number}}</div>
+    <div id="phone_field">Phone: {{user.phone}}</div>
     {{ form|as_bootstrap }}
     <button type="submit" class="btn">Request Alert</button>
 </div>

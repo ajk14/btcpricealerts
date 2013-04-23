@@ -3,11 +3,13 @@ $(document).ready(function(){
 		var value = $(this).val();
 		if (value == "EMAIL")
 		    {
-			console.log("EMAIL");
+			$("#text_message")[0].style.display='none';
+			$("#email_message")[0].style.display='block';
 		    }
 		else if (value == "SMS")
 		    {
-			console.log("SMS");
+			$('#email_message')[0].style.display='none';
+			$('#text_message')[0].style.display='block';
 		    }
 		else
 		    {
