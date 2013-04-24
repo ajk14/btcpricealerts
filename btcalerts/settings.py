@@ -6,6 +6,8 @@ TEMPLATE_DEBUG = DEBUG
 
 AUTH_USER_MODEL = 'alert.AUser'
 
+ALLOWED_HOSTS = ['www.btcpricealerts.com']
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )

@@ -1,7 +1,7 @@
 # Django settings for btcalerts project.
 import os.path
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 AUTH_USER_MODEL = 'alert.AUser'
