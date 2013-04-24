@@ -1,44 +1,20 @@
 from django.db import models
-from django.forms import ModelForm, FloatField, EmailField, CharField, PasswordInput, ValidationError, Form, ChoiceField, RadioSelect
 from django.contrib.auth.models import AbstractBaseUser
-from django.contrib.localflavor.us.forms import USPhoneNumberField
-from django.db.models.signals import post_save
 from django.conf import settings
-from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 import datetime
-import phonenumbers
-from django import template
 
-register = template.Library()
-
-DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
-ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
-
-
-@register.filter(name='phonenumber')
-def phonenumber(value, country=None):
-   return phonenumbers.parse(value, country)
-
-class PhoneForm(Form):
-    phone = USPhoneNumberField()
-
-class AlertForm(Form):
-    delivery_type = ChoiceField(choices=DELIVERY_CHOICES, widget=RadioSelect())
-    alert_when = ChoiceField(choices=ALERT_CHOICES, widget=RadioSelect())
-    threshold = FloatField()
-    
+# Class to manage the creation of new users and superusers    
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None, is_active=True):
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError(settings.MISSING_EMAIL)
  
         user = self.model(
             email=MyUserManager.normalize_email(email),
         )
- 
-        #user.is_active = False
+
         user.date_joined = datetime.datetime.now() 
         user.set_password(password)
         user.save(using=self._db)
@@ -51,8 +27,8 @@ class MyUserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
- 
- 
+
+# Abstraction of User, where identifier is e-mail instead of user ID
 class AUser(AbstractBaseUser):        
     email = models.EmailField(max_length=254, unique=True, db_index=True)
     phone = models.CharField(max_length=20)
@@ -62,6 +38,8 @@ class AUser(AbstractBaseUser):
     date_joined = models.DateTimeField()
     phone_is_active = models.BooleanField(default=False)
     phone_activation_code = models.IntegerField(null=True)
+    
+    # Special field to be compatible with built in Auth model
     USERNAME_FIELD = 'email'
  
     def get_full_name(self):
@@ -84,8 +62,6 @@ class AUser(AbstractBaseUser):
         return True
     
     def email_user(self, subject, message, from_address):
-        print "Sending email now"
-        print message
         send_mail(subject, message, from_address, [self.email], fail_silently=False)
         return True
  
@@ -95,20 +71,5 @@ class AUser(AbstractBaseUser):
         return self.is_admin
 
 
-class RegistrationForm(ModelForm):
-    confirm_password = CharField(widget=PasswordInput())
-    class Meta:
-        model = AUser
-        fields = ("email", "password", "confirm_password")
-        widgets = {
-            'password': PasswordInput(),
-        }
-
-
-    def clean(self):
-        super(RegistrationForm, self).clean()
-        if self.cleaned_data['confirm_password']!=self.cleaned_data['password']:
-            raise ValidationError("Passwords don't match")
-        return self.cleaned_data
 
 

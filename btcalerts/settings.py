@@ -1,8 +1,34 @@
 # Django settings for btcalerts project.
 import os.path
 
-DEBUG = False
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOCAL_MACHINE = True
+if BASE_DIR != "/Users/andykaier/Documents/btcalerts/btcalerts":
+    LOCAL_MACHINE = False
+
+
+DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
+ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
+
+
+DEBUG = False 
+if LOCAL_MACHINE:
+    DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
+
+REQUEST_URL = "http://alerts.btcpricealerts.com:9876"
+REQUEST_EXTENSION = "/alerts"
+
+MAX_OUTSTANDING_ALERTS = 10
+
+MISSING_EMAIL = "Users must supply a valid e-mail address"
+ALERT_SUCCESS = "You've created a new alert!"
+ALERT_FAILURE = "Your alert failed to be created. Please try again later."
+MAX_ALERTS_EXCEEDED = "Sorry, you can't create more than " + str(MAX_OUTSTANDING_ALERTS) + " alerts."
+CONFIRMATION_PROMPT = "Your BTC Price Alerts verification code is: "
+CONFIRMATION_NEXT = ". If you did not request this message, please ignore."
+
 
 AUTH_USER_MODEL = 'alert.AUser'
 
@@ -24,12 +50,6 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-LOCAL_MACHINE = True
-if BASE_DIR != "/Users/andykaier/Documents/btcalerts/btcalerts":
-    print BASE_DIR
-    LOCAL_MACHINE = False
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

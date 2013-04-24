@@ -9,17 +9,15 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 import datetime
 
-DELIVERY_CHOICES = [('SMS', 'Text Message'), ('EMAIL', 'E-mail')]
-ALERT_CHOICES = [('OVER', 'Above'), ('UNDER', 'Below')]
-
 class PhoneForm(Form):
     phone = USPhoneNumberField()
 
 class AlertForm(Form):
-    delivery_type = ChoiceField(choices=DELIVERY_CHOICES, widget=RadioSelect())
-    alert_when = ChoiceField(choices=ALERT_CHOICES, widget=RadioSelect())
+    delivery_type = ChoiceField(choices=settings.DELIVERY_CHOICES, widget=RadioSelect())
+    alert_when = ChoiceField(choices=settings.ALERT_CHOICES, widget=RadioSelect())
     threshold = FloatField()
-    
+
+# Class to manage the creation of new users and superusers    
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password=None, is_active=True):
         if not email:
@@ -28,8 +26,7 @@ class MyUserManager(BaseUserManager):
         user = self.model(
             email=MyUserManager.normalize_email(email),
         )
- 
-        #user.is_active = False
+
         user.date_joined = datetime.datetime.now() 
         user.set_password(password)
         user.save(using=self._db)
@@ -42,8 +39,8 @@ class MyUserManager(BaseUserManager):
         user.is_admin = True
         user.save(using=self._db)
         return user
- 
- 
+
+# Abstraction of User, where identifier is e-mail instead of user ID
 class AUser(AbstractBaseUser):        
     email = models.EmailField(max_length=254, unique=True, db_index=True)
     phone = models.CharField(max_length=20)
