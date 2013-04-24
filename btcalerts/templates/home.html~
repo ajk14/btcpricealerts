@@ -1,5 +1,8 @@
 {% extends "base.html" %}
+
 {% load bootstrap_toolkit %}
+{% load custom_tags %} 
+
 {% block title %}
 Bitcoin Price Alerts
 {% endblock %}
@@ -11,23 +14,26 @@ Bitcoin Price Alerts
 <h3>Your Active Alerts</h3>
 <table class="table">
 <tr>
-  <td><strong>Alert Type</strong></td>
-  <td><strong>User</strong></td>
-  <td><strong>Alert Destination</strong></td>
+  <td><strong>Type</strong></td>
+  <td><strong>Destination</strong></td>
   <td><strong>Alert When</strong></td>
   <td><strong>Threshold</strong></td>
-  <td><strong>ID</strong></td>
-  <td><strong>Edit</strong></td>
   <td><strong>Delete</strong></td>
 </tr>
 {% for alert in myAlerts %}
 <tr>
-  {% for k,v in alert.items %}
   <td>
-  {{v}}
+    {{ alert.delivery_type }}
   </td>
-  {% endfor %}
-  <td><a href="/edit?id={{alert.id}}"><i class="icon-edit"></i></a></td>
+  <td>
+    {{ alert.destination }}
+  </td>
+  <td>
+    {{ alert.alert_when }}
+  </td>
+  <td>
+    ${{ alert.threshold }}
+  </td>
   <td><a href="/delete?id={{alert.id}}"><i class="icon-trash"></i></a></td>
 </tr>
 {% endfor %}
@@ -36,8 +42,10 @@ Bitcoin Price Alerts
 <div class="span5">
   <form class="form-signin" action="/alert/" method="post">
     <h2 class="form-signin-heading">Request New Alert</h2>
-    <p><a href="/phone/"> Add a phone number for SMS alerts </a></p>
-      {% csrf_token %}
+    {% csrf_token %}
+    {% if phone_unprovided %}
+    <p class="text-error">You must <a href="/phone/">confirm a phone nubmer</a> for text alerts.</p>
+    {% endif %}
     {% if messages %}
     <ul class="messages">
       {% for message in messages %}
@@ -56,11 +64,19 @@ Bitcoin Price Alerts
     Your new alert failed to be created.
     {% endif %}
 
-    <div id="email_field">E-mail: {{user.email}}</div>
-    <div id="phone_field">Phone: {{user.phone}}</div>
-    {{ form|as_bootstrap }}
+    {{form.delivery_type|as_bootstrap}}
+    {% if user.phone %}
+    <p style="display:none" id="text_message">Sending text alerts to {{user.phone|phonenumber}} - <a href="/phone">Change</a></p>
+    {% else %}
+    <p style="display:none" id="text_message"><a href="/phone">Add a phone number for SMS alerts</a></p>
+    {% endif %}
+    <p style="display:none" id="email_message">Your e-mail alerts will be sent to {{user.email}}</p>
+    {{form.alert_when|as_bootstrap}}
+    {{form.threshold|as_bootstrap}}
     <button type="submit" class="btn">Request Alert</button>
+ </form>
 </div>
+
 {% else %}
 <div class="span 11 offset1">
 <p class="lead">

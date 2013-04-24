@@ -19,7 +19,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="/">Chaos Lord</a>
+          <a class="brand" href="/">Bitcoin Price Alerts</a>
           <div class="nav-collapse collapse">
   {% if user.is_authenticated %}
   <div class="nav-collapse collapse">
