@@ -3,6 +3,10 @@ from urllib import urlencode
 from hashlib import sha1
 import requests, json, hmac
 
+#
+# These two functions manage the signing of our HTML requests to guarantee
+# integrity and authenticity.
+#
 def isValidSignature (method, path, signature):
     return createSignature(method,path) == signature
 
@@ -13,8 +17,6 @@ def createSignature(method, path):
     print hashed.hexdigest()
     return hashed.hexdigest()
 
-def sendMessage():
-    return None
 
 #
 # Try to delete the request of a particular user. Return the status code

@@ -11,7 +11,7 @@ from twilio.rest import TwilioRestClient
 from random import randint
 from hashlib import sha1
 from urllib import urlencode
-from alert.messages import getAlerts, createSignature, deleteAlert, createAlert
+from alert.messages import getAlerts, deleteAlert, createAlert
 import requests, json, hmac
 
 @login_required

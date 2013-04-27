@@ -54,15 +54,13 @@ def phone(request):
 def home(request):
     context = {}
     form = AlertForm()
-    context['form'] = form
     if request.POST:
-        context['phone_number'] = str(request.user.phone)
         form = AlertForm(request.POST, request=request)
-        context['form'] = form
         if form.is_valid():
             createAlert(request.user, request.POST['delivery_type'],
                     request.POST['alert_when'], request.POST['threshold'])
 
+    context['form'] = form
     context['myAlerts'], status  = getAlerts(request.user)
     return render_to_response("home.html", context, context_instance=RequestContext(request))
 
