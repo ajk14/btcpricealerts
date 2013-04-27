@@ -3,14 +3,37 @@ from django.db import models
 from django import forms
 from django.contrib.localflavor.us.forms import USPhoneNumberField
 from alert.models import AUser
+from alert.messages import getAlerts
+import requests
 
 class PhoneForm(forms.Form):
     phone = USPhoneNumberField()
-
+    
 class AlertForm(forms.Form):
-    delivery_type = forms.ChoiceField(choices=settings.DELIVERY_CHOICES, widget=forms.RadioSelect())
-    alert_when = forms.ChoiceField(choices=settings.ALERT_CHOICES, widget=forms.RadioSelect())
+    delivery_type = forms.ChoiceField(choices=settings.DELIVERY_CHOICES, 
+                                      widget=forms.RadioSelect())
+    alert_when = forms.ChoiceField(choices=settings.ALERT_CHOICES, 
+                                   widget=forms.RadioSelect())
     threshold = forms.FloatField()
+    
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(AlertForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        user = self.request.user
+        phone_permitted = user.phone and user.phone_is_active
+        is_phone = cleaned_data["delivery_type"] == "SMS"
+        if is_phone and not phone_permitted:
+            raise forms.ValidationError(settings.MISSING_PHONE)
+       
+        alerts, status = getAlerts(user)
+        if status == requests.codes.ok:
+            if len(alerts) >= settings.MAX_OUTSTANDING_ALERTS:  
+                raise forms.ValidationError(settings.MAX_ALERTS_EXCEEDED)
+            else: return cleaned_data
+        raise forms.ValidationError(settings.MAX_ALERTS_EXCEEDED)
 
 class RegistrationForm(forms.ModelForm):
     confirm_password = forms.CharField(widget=forms.PasswordInput())
@@ -24,6 +47,7 @@ class RegistrationForm(forms.ModelForm):
 
     def clean(self):
         super(RegistrationForm, self).clean()
-        if self.cleaned_data['confirm_password']!=self.cleaned_data['password']:
+        data = self.cleaned_data
+        if data['confirm_password'] != data['password']:
             raise ValidationError("Passwords don't match")
-        return self.cleaned_data
+        return data

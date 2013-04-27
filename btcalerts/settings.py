@@ -22,6 +22,7 @@ REQUEST_EXTENSION = "/alerts"
 
 MAX_OUTSTANDING_ALERTS = 10
 
+MISSING_PHONE = "You must verify a phone number before sending text alerts."
 MISSING_EMAIL = "Users must supply a valid e-mail address"
 ALERT_SUCCESS = "You've created a new alert!"
 ALERT_FAILURE = "Your alert failed to be created. Please try again later."

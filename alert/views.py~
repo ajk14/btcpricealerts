@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
+from django.http import HttpResponse
 from alert.models import AUser
 from alert.forms import RegistrationForm, AlertForm, PhoneForm
 from django.contrib.auth import authenticate, login 
@@ -10,6 +11,7 @@ from twilio.rest import TwilioRestClient
 from random import randint
 from hashlib import sha1
 from urllib import urlencode
+from alert.messages import getAlerts, createSignature, deleteAlert, createAlert
 import requests, json, hmac
 
 @login_required
@@ -49,93 +51,28 @@ def phone(request):
         context['form'] = PhoneForm()
     return render_to_response("phone.html", context, context_instance=RequestContext(request))
 
-def createSignature(method, path, body):
-    message = method+path+body
-    hashed = hmac.new(settings.SECRET_KEY_SIGN, message, sha1)
-    """
-    print "--------------"
-    print message
-    print hashed.hexdigest()
-    print "---------------"
-    """
-    return hashed.hexdigest()
-
-def isValidSignature (method, path, body, signature):
-    return createSignature(method,path,body) == signature
-
-def loadAlerts(user):
-    payload = {}
-    payload["user_id"] = str(user)
-    signVal = "?" + urlencode(payload)
-    signature = createSignature("GET", settings.REQUEST_EXTENSION, signVal)
-    try:
-        r = requests.get(settings.REQUEST_URL + settings.REQUEST_EXTENSION, params=payload, headers={'X-Signature':signature})
-    except requests.RequestException:
-        return None
-    if "X-Signature" in r.headers:
-        if not isValidSignature("GET", settings.REQUEST_EXTENSION, str(r.content), r.headers["X-Signature"]):
-            return None
-    alertList = json.loads(r.content)
-    return alertList['alerts']
-
 def home(request):
     context = {}
     form = AlertForm()
     context['form'] = form
-    context['myAlerts'] = loadAlerts(request.user)
+    if request.POST:
+        context['phone_number'] = str(request.user.phone)
+        form = AlertForm(request.POST, request=request)
+        context['form'] = form
+        if form.is_valid():
+            createAlert(request.user, request.POST['delivery_type'],
+                    request.POST['alert_when'], request.POST['threshold'])
+
+    context['myAlerts'], status  = getAlerts(request.user)
     return render_to_response("home.html", context, context_instance=RequestContext(request))
 
 @login_required
 def delete(request):
     context = {}
-    id = request.GET['id']
-    urlExt = settings.REQUEST_EXTENSION + "/" + id
-    url = settings.REQUEST_URL + urlExt
-    signature = createSignature("DELETE", urlExt, "")
-    try:
-        r = requests.delete(url, headers={'X-Signature':signature})
-    except requests.RequestException:
+    status = deleteAlert(request.GET['id'], request.user)
+    if status == requests.codes.ok:
         return redirect("/")
-    return redirect("/")
-
-@login_required
-def alert(request):
-    context = {}
-    form = AlertForm(request.POST)
-    context['form'] = form
-    context['phone_number'] = str(request.user.phone)
-    if form.is_valid():
-        # Ensure phone number verified if type = SMS
-        if request.POST['delivery_type'] == 'SMS':
-            if not request.user.phone or not request.user.phone_is_active:
-                context['phone_unprovided'] = True
-                context['myAlerts'] = loadAlerts(request.user)
-                return render_to_response("home.html", context, context_instance=RequestContext(request))
-        if len(loadAlerts(request.user)) >= settings.MAX_OUTSTANDING_ALERTS:
-            messages.error(request, settings.MAX_ALERTS_EXCEEDED)
-            return redirect("/")
-        if request.POST['delivery_type'] == 'SMS':
-            destination = request.user.phone
-        else:
-            destination = request.user
-   
-        payload = {'delivery_type' : str(request.POST['delivery_type']), 
-                   'destination' : str(destination),
-                   'threshold' : str(request.POST['threshold']), 
-                   'alert_when' : str(request.POST['alert_when']), 
-                   'user_id' : str(request.user)}
-   
-        signature = createSignature("POST", settings.REQUEST_EXTENSION, "?" + urlencode(payload))
-        try:
-            r = requests.post(settings.REQUEST_URL + settings.REQUEST_EXTENSION, params=payload, headers={'X-Signature':signature})
-        except requests.RequestException:
-            messages.error(request, settings.ALERT_FAILURE)
-            return redirect("/")
-        messages.success(request, settings.ALERT_SUCCESS)
-    else:
-        context['myAlerts'] = loadAlerts(request.user)
-        return render_to_response("home.html", context, context_instance=RequestContext(request))
-    return redirect("/") 
+    return HttpResponse("Unauthorized", status=status)
 
 def myLogin(request):
     context = {}

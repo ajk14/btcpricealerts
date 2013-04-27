@@ -44,23 +44,12 @@ Bitcoin Price Alerts
 </table>
 </div>
 <div class="span5">
-  <form class="form-signin" action="/alert/" method="post">
+  <form class="form-signin" action="" method="post">
     <h2 class="form-signin-heading">Request New Alert</h2>
     {% csrf_token %}
-    {% if phone_unprovided %}
-    <p class="text-error">You must <a href="/phone/">verify a phone nubmer</a> for text alerts.</p>
-    {% endif %}
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        {% if message.tags == 'error' %}     
-        <p class="text-error">{{message}}</p>
-	{% else %}
-        <p class="text-success">{{message}}</p>
-        {% endif %}
-      {% endfor %}
-    </ul>
-    {% endif %}
+    {% for error in form.non_field_errors %}
+      <p class="text-error">{{error}}</p>
+    {% endfor %}
     {% if alert_succeeded %}
     You have created a new alert.
     {% endif %}

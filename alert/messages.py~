@@ -1,0 +1,88 @@
+from django.conf import settings
+from urllib import urlencode
+from hashlib import sha1
+import requests, json, hmac
+
+def isValidSignature (method, path, body, signature):
+    return createSignature(method,path,body) == signature
+
+def createSignature(method, path):
+    message = method + path 
+    hashed = hmac.new(settings.SECRET_KEY_SIGN, message, sha1)
+    print message
+    print hashed.hexdigest()
+    return hashed.hexdigest()
+
+def sendMessage():
+    return None
+
+#
+# Try to delete the request of a particular user. Return the status code
+# recieved from alerts server.
+#
+def deleteAlert(id, user):
+    payload = {}
+    payload["user_id"]  = str(user)
+    extension = settings.REQUEST_EXTENSION + "/" + id + "?" + urlencode(payload)
+    url = settings.REQUEST_URL + extension
+    signature = createSignature("DELETE", extension)
+    headers={'X-Signature':signature}
+    try:
+        r = requests.delete(url, headers=headers)
+    except requests.RequestException:
+        return 500
+
+    return r.status_code
+
+#
+# Create a new alert for a given set of parameters, returning an HTTP Response code
+#
+def createAlert(user, type, alert_when, threshold):
+    destination = request.user.phone if type == "SMS" else destination = request.user
+    payload = {'delivery_type' : type,
+                   'destination' : destination,
+                   'threshold' : threshold,
+                   'alert_when' : alert_when,
+                   'user_id' : user}
+
+    extension = settings.REQUEST_EXTENSTION + "?" + urlencode(payload)
+    signature = createSignature("POST", extension)
+    url = settings.REQUEST_URL + settings.REQUEST_EXTENSION
+    headers = {'X-Signature':signature}
+    try:
+        r = requests.post(url, params=payload, headers=headers)
+    except requests.RequestException:
+        return 500
+
+    return r.status_code
+
+#
+# Send a request to the alerts server to get all alerts for a particular
+# user. Return the list of users and an HTTP status code.
+#
+def getAlerts(user):
+    payload = {}
+    payload["user_id"] = str(user)
+    extension = settings.REQUEST_EXTENSION + "?" + urlencode(payload)
+    signature = createSignature("GET", extension)
+    url = settings.REQUEST_URL + settings.REQUEST_EXTENSION
+    headers = {'X-Signature':signature}
+
+    try:
+        r = requests.get(url, params=payload, headers=headers)
+    except requests.RequestException:
+        return None, 500
+
+    if r.status_code == requests.codes.ok:
+        print "Sig should be: " 
+        print r.headers["X-Signature"]
+        print "There it was"
+        if not isValidSignature("GET", settings.REQUEST_EXTENSION, 
+                                str(r.content), r.headers["X-Signature"]):
+            return None, 401
+
+        response = json.loads(r.content)
+        if alerts in response:
+            return response['alerts'], r.status_code
+        else: return None, 500
+    return None, r.status_code

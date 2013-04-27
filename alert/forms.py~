@@ -1,22 +1,47 @@
+from django.conf import settings
 from django.db import models
-from django.forms import ModelForm, FloatField, EmailField, CharField, PasswordInput, ValidationError, Form, ChoiceField, RadioSelect
+from django import forms
 from django.contrib.localflavor.us.forms import USPhoneNumberField
+from alert.models import AUser
+from alert.messages import getAlerts
+import requests
 
-class PhoneForm(Form):
+class PhoneForm(forms.Form):
     phone = USPhoneNumberField()
+    
+class AlertForm(forms.Form):
+    delivery_type = forms.ChoiceField(choices=settings.DELIVERY_CHOICES, 
+                                      widget=forms.RadioSelect())
+    alert_when = forms.ChoiceField(choices=settings.ALERT_CHOICES, 
+                                   widget=forms.RadioSelect())
+    threshold = forms.FloatField()
+    
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super(AlertForm, self).__init__(*args, **kwargs)
 
-class AlertForm(Form):
-    delivery_type = ChoiceField(choices=settings.DELIVERY_CHOICES, widget=RadioSelect())
-    alert_when = ChoiceField(choices=settings.ALERT_CHOICES, widget=RadioSelect())
-    threshold = FloatField()
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        user = self.request.user
+        phone_permitted = user.phone and user.phone_is_active
+        is_phone = cleaned_data["delivery_type"] == "SMS"
+        if is_phone and not phone_permitted:
+            raise forms.ValidationError(settings.MISSING_PHONE)
+       
+        alerts, status = getAlerts(user)
+        if status == requests.codes.ok:
+            if len(alerts) >= settings.MAX_OUTSTANDING_ALERTS:  
+                raise forms.ValidationError(settings.MAX_ALERTS_EXCEEDED)
+            else: return cleaned_data
+        raise forms.ValidationError(settings.MAX_ALERTS_EXCEEDED)
 
-class RegistrationForm(ModelForm):
-    confirm_password = CharField(widget=PasswordInput())
+class RegistrationForm(forms.ModelForm):
+    confirm_password = forms.CharField(widget=forms.PasswordInput())
     class Meta:
         model = AUser
         fields = ("email", "password", "confirm_password")
         widgets = {
-            'password': PasswordInput(),
+            'password': forms.PasswordInput(),
         }
 
 
