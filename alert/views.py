@@ -5,12 +5,14 @@ from alert.models import AUser
 from alert.forms import RegistrationForm, AlertForm, PhoneForm
 from django.contrib.auth import authenticate, login 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from twilio.rest import TwilioRestClient
 from random import randint
 from hashlib import sha1
 from urllib import urlencode
 import requests, json, hmac
 
+@login_required
 def phone_confirmation(request):
     context = {}
     if request.POST:
@@ -23,6 +25,7 @@ def phone_confirmation(request):
             context['confirmation_failed'] = True
     return render_to_response("phone_confirm.html", context, context_instance=RequestContext(request))
 
+@login_required
 def phone(request):
     context = {}
     if request.POST:
@@ -32,6 +35,7 @@ def phone(request):
             id = randint(10000000, 99999999) #8 digit numbers w/o leading 0
             user = request.user
             user.phone_activation_code = id
+            user.phone_is_active = False
             user.phone = request.POST["phone"]
             user.save()
             client = TwilioRestClient(settings.TWILIO_SID, settings.TWILIO_AUTH_TOKEN)
@@ -81,10 +85,13 @@ def home(request):
     context['myAlerts'] = loadAlerts(request.user)
     return render_to_response("home.html", context, context_instance=RequestContext(request))
 
+@login_required
 def delete(request):
     context = {}
     id = request.GET['id']
-    urlExt = settings.REQUEST_EXTENSION + "/" + id
+    payload = {} 
+    payload["user_id"]  = str(request.user)
+    urlExt = settings.REQUEST_EXTENSION + "/" + id + "?" + urlencode(payload)
     url = settings.REQUEST_URL + urlExt
     signature = createSignature("DELETE", urlExt, "")
     try:
@@ -93,6 +100,7 @@ def delete(request):
         return redirect("/")
     return redirect("/")
 
+@login_required
 def alert(request):
     context = {}
     form = AlertForm(request.POST)
@@ -101,7 +109,7 @@ def alert(request):
     if form.is_valid():
         # Ensure phone number verified if type = SMS
         if request.POST['delivery_type'] == 'SMS':
-            if not request.user.phone:
+            if not request.user.phone or not request.user.phone_is_active:
                 context['phone_unprovided'] = True
                 context['myAlerts'] = loadAlerts(request.user)
                 return render_to_response("home.html", context, context_instance=RequestContext(request))

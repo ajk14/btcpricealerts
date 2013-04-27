@@ -34,6 +34,9 @@ AUTH_USER_MODEL = 'alert.AUser'
 
 ALLOWED_HOSTS = ['www.btcpricealerts.com']
 
+
+LOGIN_URL = "/"
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )

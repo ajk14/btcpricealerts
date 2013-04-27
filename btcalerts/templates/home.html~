@@ -26,7 +26,11 @@ Bitcoin Price Alerts
     {{ alert.delivery_type }}
   </td>
   <td>
+    {% if alert.delivery_type == "SMS" %}
+    {{ alert.destination|phonenumber }}
+    {% else %}
     {{ alert.destination }}
+    {% endif %}
   </td>
   <td>
     {{ alert.alert_when }}
@@ -91,30 +95,24 @@ Your account has not yet been activated. Please check your email and click on th
         <a class="btn btn-large btn-success" href="/accounts/register/">Set up your alert now!</a>
       </div>
 
-      <hr>
-      <div class="row-fluid marketing">
-{% endif %}
-
-	<!--        <div class="span6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
-
-        <div class="span6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
-        </div>
--->
+<!--      <hr>
+      <div class="center">
+      <div class="span4 offset1">
+	<h4>Subheading</h4>
+	<p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+      </div>
+      <div class="span4">
+	<h4>Subheading</h4>
+	<p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+      </div>
+      <div class="span4">
+        <h4>Subheading</h4>
+        <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+      </div>
+      <div>
+      </br>
+      </div>
+      </div>
+      -->
+     {% endif %}
 {% endblock %}
