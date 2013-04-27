@@ -7,85 +7,48 @@ from alert.forms import RegistrationForm, AlertForm, PhoneForm
 from django.contrib.auth import authenticate, login 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from twilio.rest import TwilioRestClient
-from random import randint
-from hashlib import sha1
-from urllib import urlencode
 from alert.messages import getAlerts, deleteAlert, createAlert
+from alert.phone import phone, phone_confirmation
 import requests, json, hmac, registration, alert
 
-@login_required
-def phone_confirmation(request, context):
-    try:
-        supplied_id = int(request.POST['confirmation'])
-    except ValueError:
-        context['confirmation_failed'] = True
-        return render_to_response("home.html", context, 
-                                  context_instance=RequestContext(request))
-    if supplied_id == request.user.phone_activation_code:
-        request.user.phone_is_active = True
-        request.user.save()
-        context['successfully_confirmed_phone'] = True
-        return render_to_response("home.html", context, 
-                                  context_instance=RequestContext(request))
-    else:
-        context['confirmation_failed'] = True
-    return render_to_response("home.html", context, 
-                              context_instance=RequestContext(request))
-
-@login_required
-def phone(request, context):
-    form = PhoneForm(request.POST)
-    context['phone_form'] = form
-    if form.is_valid():
-        id = randint(10000000, 99999999) #8 digit numbers w/o leading 0
-        user = request.user
-        user.phone_activation_code = id
-        user.phone_is_active = False
-        user.phone = request.POST["phone"]
-        user.save()
-        client = TwilioRestClient(settings.TWILIO_SID, settings.TWILIO_AUTH_TOKEN)
-        message = client.sms.messages.create(body=settings.CONFIRMATION_PROMPT 
-                                             + str(id) + settings.CONFIRMATION_NEXT,
-                                             to=request.POST["phone"],
-                                             from_=settings.TWILIO_NUMBER)
-        context['confirm_phone'] = True
-        return render_to_response("home.html", context, context_instance=RequestContext(request))
-    else:
-        return render_to_response("home.html", context, context_instance=RequestContext(request))
-
-    context['form'] = PhoneForm()
-    return render_to_response("phone.html", context, context_instance=RequestContext(request))
 
 def home(request):
     context = {}
-    form = AlertForm()
+    alert_form = AlertForm()
     registration_form = RegistrationForm()
     phone_form = PhoneForm()
 
-    context['form'] = form
+    context['alert_form'] = alert_form
     context['registration_form'] = registration_form
     context['phone_form'] = phone_form
     context['myAlerts'], status  = getAlerts(request.user)
 
     if request.POST:
         if "registration_form" in request.POST:
-
-            return registration.views.register(request, "registration.backends.default.DefaultBackend", template_name="home.html", form_class=alert.forms.RegistrationForm, extra_context=context)
+            form_class = alert.forms.RegistrationForm
+            backend = "registration.bakends.default.DefaultBackend"
+            return registration.views.register(request, backend,
+                                               template_name="home.html", 
+                                               form_class=form_class, 
+                                               extra_context=context)
         elif "phone_form" in request.POST:
             return phone(request, context)
         elif "confirm_phone" in request.POST:
             return phone_confirmation(request, context)
-        else:
-            form = AlertForm(request.POST, request=request)
-            if form.is_valid():
-                status = createAlert(request.user, request.POST['delivery_type'],
-                                     request.POST['alert_when'], 
-                                     request.POST['threshold'])
-                if status == requests.codes.ok:
-                    context['alert_succeeded'] = True
-                else: context['alert_failed'] = True
+        elif "alert_form" in request.POST:
+            return alert(request, context)
+    return render_to_response("home.html", context, context_instance=RequestContext(request))
 
+def alert(request, context):
+    form = AlertForm(request.POST, request=request)
+    if form.is_valid():
+        status = createAlert(request.user, request.POST['delivery_type'],
+                             request.POST['alert_when'],
+                             request.POST['threshold'])
+        if status == requests.codes.ok:
+            context['alert_succeeded'] = True
+        else: context['alert_failed'] = True
+        context['myAlerts'], status  = getAlerts(request.user)
     return render_to_response("home.html", context, context_instance=RequestContext(request))
 
 @login_required

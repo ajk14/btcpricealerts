@@ -61,7 +61,7 @@ Bitcoin Price Alerts
     {{form.delivery_type|as_bootstrap}}
 
     {% if user.phone and user.phone_is_active %}
-    <p style="display:none" id="text_message">Sending text alerts to {{user.phone|phonenumber}} - <a href="/phone">Change</a></p>
+    <p style="display:none" id="text_message">Sending text alerts to {{user.phone|phonenumber}} - <a href="#phoneModal" data-toggle="modal">Change</a></p>
     {% else %}
    <p style="display:none" id="text_message"><a href="#phoneModal" data-toggle="modal">Verify a phone number for SMS alerts</a></p>
     {% endif %}
@@ -73,6 +73,14 @@ Bitcoin Price Alerts
     <button type="submit" class="btn">Request Alert</button>
   </form>
 </div>
+
+<script type="text/javascript">
+{% if user.phone and user.phone_is_active %}
+var PHONE_ACTIVE = 1;
+{% else %}
+var PHONE_ACTIVE = 0;
+{% endif %}
+</script>
 
 {% if phone_form.errors %}
 <script type="text/javascript">
@@ -149,7 +157,7 @@ $(document).ready(function(){
     <h3 id="myModalLabel">Verification Succeeded</h3>
   </div>
  <div class="modal-body">
-   <p class="text-success">You have successfully verified you phone nubmer. You can now create text alerts.</p>
+   <p class="text-success">You have successfully verified your phone nubmer. You can now create text alerts.</p>
  </div>
  <div class="modal-footer">
    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
