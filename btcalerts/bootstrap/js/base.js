@@ -1,3 +1,5 @@
+var firstClick = 1;
+
 function updateMessages(value)
 {
     if (value == "EMAIL")
@@ -20,6 +22,12 @@ $(document).ready(function(){
 		
 	    }
 	$('input:radio[name=delivery_type]').click(function(){
+		value = $(this).val();
+		if (value == "SMS" && firstClick && !PHONE_ACTIVE)
+		    {
+			firstClick = 0; 
+			$('#phoneModal').modal('show');
+		    }
 		updateMessages($(this).val())
 		    });
     });

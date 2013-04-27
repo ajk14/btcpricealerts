@@ -10,81 +10,209 @@ Bitcoin Price Alerts
 {% block content%}
 {% if user.is_authenticated %}
 {% if user.is_active %}
+
+{% if registration_form.errors %}
+{% endif %}
+
+<!-- DISPLAY ALERTS TABLE -->
 <div class="span10 offset1">
-<h3>Your Active Alerts</h3>
-<table class="table">
-<tr>
-  <td><strong>Type</strong></td>
-  <td><strong>Destination</strong></td>
-  <td><strong>Alert When</strong></td>
-  <td><strong>Threshold</strong></td>
-  <td><strong>Delete</strong></td>
-</tr>
-{% for alert in myAlerts %}
-<tr>
-  <td>
-    {{ alert.delivery_type }}
-  </td>
-  <td>
-    {% if alert.delivery_type == "SMS" %}
-    {{ alert.destination|phonenumber }}
-    {% else %}
-    {{ alert.destination }}
-    {% endif %}
-  </td>
-  <td>
-    {{ alert.alert_when }}
-  </td>
-  <td>
-    ${{ alert.threshold }}
-  </td>
-  <td><a href="/delete?id={{alert.id}}"><i class="icon-trash"></i></a></td>
-</tr>
-{% endfor %}
-</table>
+  <h3>Your Active Alerts</h3>
+  <table class="table">
+    <tr>
+      <td><strong>Type</strong></td>
+      <td><strong>Destination</strong></td>
+      <td><strong>Alert When</strong></td>
+      <td><strong>Threshold</strong></td>
+      <td><strong>Delete</strong></td>
+    </tr>
+    {% for alert in myAlerts %}
+    <tr>
+      <td>{{ alert.delivery_type }}</td>
+      <td>
+	{% if alert.delivery_type == "SMS" %}
+	{{ alert.destination|phonenumber }}
+	{% else %}
+	{{ alert.destination }}
+	{% endif %}
+      </td>
+      <td>{{ alert.alert_when }}</td>
+      <td>${{ alert.threshold }}</td>
+      <td><a href="/delete?id={{alert.id}}"><i class="icon-trash"></i></a></td>
+    </tr>
+    {% endfor %}
+  </table>
 </div>
+
+<!-- DISPLAY ALERT REQUEST FORM -->
 <div class="span5">
   <form class="form-signin" action="" method="post">
     <h2 class="form-signin-heading">Request New Alert</h2>
     {% csrf_token %}
     {% for error in form.non_field_errors %}
-      <p class="text-error">{{error}}</p>
+    <p class="text-error">{{error}}</p>
     {% endfor %}
     {% if alert_succeeded %}
-    You have created a new alert.
+    <p class="text-success">You have created a new alert.</p>
     {% endif %}
     {% if alert_failed %}
-    Your new alert failed to be created.
+    <p class = "text-error">Your new alert failed to be created. Please try again later.</p>
     {% endif %}
 
     {{form.delivery_type|as_bootstrap}}
-    {% if user.phone and user.phone_is_active%}
-    <p style="display:none" id="text_message">Sending text alerts to {{user.phone|phonenumber}} - <a href="/phone">Change</a></p>
+
+    {% if user.phone and user.phone_is_active %}
+    <p style="display:none" id="text_message">Sending text alerts to {{user.phone|phonenumber}} - <a href="#phoneModal" data-toggle="modal">Change</a></p>
     {% else %}
-    <p style="display:none" id="text_message"><a href="/phone">Verify a phone number for SMS alerts</a></p>
+   <p style="display:none" id="text_message"><a href="#phoneModal" data-toggle="modal">Verify a phone number for SMS alerts</a></p>
     {% endif %}
     <p style="display:none" id="email_message">Your e-mail alerts will be sent to {{user.email}}</p>
+    
     {{form.alert_when|as_bootstrap}}
     {{form.threshold|as_bootstrap}}
+    
     <button type="submit" class="btn">Request Alert</button>
- </form>
+  </form>
 </div>
 
+<script type="text/javascript">
+{% if user.phone and user.phone_is_active %}
+var PHONE_ACTIVE = 1;
 {% else %}
+var PHONE_ACTIVE = 0;
+{% endif %}
+</script>
+
+{% if phone_form.errors %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#phoneModal').removeClass('fade');
+  $('#phoneModal').modal('show');
+});
+</script>
+{% endif %}
+
+<!-- Phone Modal -->
+<div id="phoneModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h3 id="myModalLabel">Verify your Phone Number</h3>
+  </div>
+ <div class="modal-body">
+      <form class="form-signin" action="" method="post" id="phone_form">
+        {% csrf_token %}
+        {{ phone_form|as_bootstrap }}
+      </form>
+ </div>
+ <div class="modal-footer">
+   <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+   <input type="submit" class="btn btn-primary" name="phone_form" form="phone_form" value="Send Verification Text"/>
+ </div>
+</div>
+
+{% if confirm_phone or confirmation_failed %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#phoneConfirmModal').modal('show');
+});
+</script>
+{% endif %}
+
+<!-- Confirm Phone Modal -->
+<div id="phoneConfirmModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h3 id="myModalLabel">Enter your verification code</h3>
+  </div>
+ <div class="modal-body">
+   <form class="form-signin" action="" method="post" id="confirm_phone">
+     {% csrf_token %}
+     {% if confirmation_failed %}
+     <p class="text-error">Your entry did not match what we have on file. Please try again.</p>
+     {% endif %}
+     <div class="control-group required">
+       <div class="controls">
+         <input id="id_confirmation" name="confirmation" type="text"/>
+       </div>
+     </div>
+   </form>
+ </div>
+ <div class="modal-footer">
+   <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+   <input type="submit" class="btn btn-primary" name="confirm_phone" form="confirm_phone" value="Confirm"/>
+ </div>
+</div>
+
+{% if successfully_confirmed_phone %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#phoneConfirmedModal').modal('show');
+});
+</script>
+{% endif %}
+
+<!-- Confirm Phone Modal -->
+<div id="phoneConfirmedModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h3 id="myModalLabel">Verification Succeeded</h3>
+  </div>
+ <div class="modal-body">
+   <p class="text-success">You have successfully verified your phone nubmer. You can now create text alerts.</p>
+ </div>
+ <div class="modal-footer">
+   <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+ </div>
+</div>
+
+
+{% else %}
+<!-- Handle case where user signed in, but not active -->
 <div class="span 11 offset1">
-<p class="lead">
-Your account has not yet been activated. Please check your email and click on the link to activate your account.
-</p>
+  <p class="lead">
+    Your account has not yet been activated. Please check your email and click on the link to activate your account.
+  </p>
 </div>
 {% endif %}
-{% else %}
-      <div class="jumbotron">
-        <h1>Real-Time Bitcoin Alerts</h1>
-        <p class="lead">Receive an e-mail or text message when the price of Bitcoin rises above or falls below a certain threshold!</p>
-        <a class="btn btn-large btn-success" href="/accounts/register/">Set up your alert now!</a>
-      </div>
 
-<!--      <hr>
+<!-- Handle not signed in case -->
+{% else %}
+<div class="jumbotron">
+  <h1>Real-Time Bitcoin Alerts</h1>
+  <p class="lead">Receive an e-mail or text message when the price of Bitcoin rises above or falls below a certain threshold!</p>
+
+{% if registration_form.errors %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#registerModal').removeClass('fade');
+  $('#registerModal').modal('show');
+});
+</script>
+{% endif %}
+  
+  <!-- Button to trigger modal -->
+  <a class="btn btn-large btn-success" role="button" data-toggle="modal" href="#registerModal">
+    Set up your alert now!</a>
+</div>
+<!-- Modal -->
+<div id="registerModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button> 
+    <h3 id="myModalLabel">Create an Account</h3>
+  </div>
+ <div class="modal-body">
+  <form class="form-signin" action="" method="post" id="registration_form">
+      {% csrf_token %}
+      {{ registration_form|as_bootstrap }}
+  </form>
+ </div>
+ <div class="modal-footer">
+   <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+   <input type="submit" class="btn btn-primary" name="registration_form" form="registration_form" value="Create Account"/>
+ </div>
+</div>
+
+
+<!--
       <div class="center">
       <div class="span4 offset1">
 	<h4>Subheading</h4>

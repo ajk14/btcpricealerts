@@ -96,6 +96,8 @@ def register(request, backend, success_url=None, form_class=None,
              disallowed_url='registration_disallowed',
              template_name='registration/registration_form.html',
              extra_context=None):
+    print "Trying to register"
+    print backend
     """
     Allow a new user to register an account.
 
@@ -176,10 +178,13 @@ def register(request, backend, success_url=None, form_class=None,
     
     """
     backend = get_backend(backend)
+    print "*****NOW****"
+    print backend
     if not backend.registration_allowed(request):
         return redirect(disallowed_url)
     if form_class is None:
         form_class = backend.get_form_class(request)
+    print form_class
 
     if request.method == 'POST':
         form = form_class(data=request.POST, files=request.FILES)

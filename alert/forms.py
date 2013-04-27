@@ -48,6 +48,12 @@ class RegistrationForm(forms.ModelForm):
     def clean(self):
         super(RegistrationForm, self).clean()
         data = self.cleaned_data
+
+        if not 'confirm_password' in data or not 'password' in data:
+            return data
+
         if data['confirm_password'] != data['password']:
-            raise ValidationError("Passwords don't match")
+            raise forms.ValidationError("Passwords don't match")
+        print data['password']
+        print data['confirm_password']
         return data

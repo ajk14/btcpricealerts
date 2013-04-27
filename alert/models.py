@@ -7,14 +7,13 @@ import datetime
 
 # Class to manage the creation of new users and superusers    
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, password=None, is_active=True):
+    def create_user(self, email, password=None, is_active=False):
         if not email:
             raise ValueError(settings.MISSING_EMAIL)
  
         user = self.model(
             email=MyUserManager.normalize_email(email),
         )
-
         user.date_joined = datetime.datetime.now() 
         user.set_password(password)
         user.save(using=self._db)
@@ -24,6 +23,7 @@ class MyUserManager(BaseUserManager):
         user = self.create_user(email,
             password=password,
         )
+        user.is_active = True
         user.is_admin = True
         user.save(using=self._db)
         return user
@@ -32,7 +32,7 @@ class MyUserManager(BaseUserManager):
 class AUser(AbstractBaseUser):        
     email = models.EmailField(max_length=254, unique=True, db_index=True)
     phone = models.CharField(max_length=20)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     objects = MyUserManager()
     date_joined = models.DateTimeField()
@@ -62,6 +62,7 @@ class AUser(AbstractBaseUser):
         return True
     
     def email_user(self, subject, message, from_address):
+        print "Sending Mail"
         send_mail(subject, message, from_address, [self.email], fail_silently=False)
         return True
  
