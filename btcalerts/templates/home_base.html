@@ -1,0 +1,17 @@
+<div class="jumbotron">
+  <h1>Real-Time Bitcoin Alerts</h1>
+  <p class="lead">Receive an e-mail or text message when the price of Bitcoin rises above or falls below a certain threshold!</p>
+
+{% if registration_form.errors %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#registerModal').removeClass('fade');
+  $('#registerModal').modal('show');
+});
+</script>
+{% endif %}
+
+  <!-- Button to trigger modal -->
+  <a class="btn btn-large btn-success" role="button" data-toggle="modal" href="#registerModal">
+    Set up your alert now!</a>
+</div>

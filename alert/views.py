@@ -25,8 +25,8 @@ def home(request):
 
     if request.POST:
         if "registration_form" in request.POST:
-            form_class = alert.forms.RegistrationForm
-            backend = "registration.bakends.default.DefaultBackend"
+            form_class = RegistrationForm
+            backend = "registration.backends.default.DefaultBackend"
             return registration.views.register(request, backend,
                                                template_name="home.html", 
                                                form_class=form_class, 

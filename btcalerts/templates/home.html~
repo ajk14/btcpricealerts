@@ -58,7 +58,7 @@ Bitcoin Price Alerts
     <p class = "text-error">Your new alert failed to be created. Please try again later.</p>
     {% endif %}
 
-    {{form.delivery_type|as_bootstrap}}
+    {{alert_form.delivery_type|as_bootstrap}}
 
     {% if user.phone and user.phone_is_active %}
     <p style="display:none" id="text_message">Sending text alerts to {{user.phone|phonenumber}} - <a href="#phoneModal" data-toggle="modal">Change</a></p>
@@ -67,10 +67,10 @@ Bitcoin Price Alerts
     {% endif %}
     <p style="display:none" id="email_message">Your e-mail alerts will be sent to {{user.email}}</p>
     
-    {{form.alert_when|as_bootstrap}}
-    {{form.threshold|as_bootstrap}}
+    {{alert_form.alert_when|as_bootstrap}}
+    {{alert_form.threshold|as_bootstrap}}
     
-    <button type="submit" class="btn">Request Alert</button>
+    <input type="submit" class="btn btn-primary" name="alert_form" value="Request Alert"/>
   </form>
 </div>
 

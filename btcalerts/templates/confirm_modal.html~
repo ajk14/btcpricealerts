@@ -1,0 +1,36 @@
+<div id="phoneConfirmModal" class="modal hide" tabindex="-1" role="dialog" aria-labell\
+edby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</but\
+ton>
+    <h3 id="myModalLabel">Enter your verification code</h3>
+  </div>
+ <div class="modal-body">
+   <form class="form-signin" action="" method="post" id="confirm_phone">
+     {% csrf_token %}
+     {% if confirmation_failed %}
+     <p class="text-error">Your entry did not match what we have on file. Please try a\
+gain.</p>
+     {% endif %}
+     <div class="control-group required">
+       <div class="controls">
+         <input id="id_confirmation" name="confirmation" type="text"/>
+       </div>
+     </div>
+   </form>
+ </div>
+ <div class="modal-footer">
+   <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+   <input type="submit" class="btn btn-primary" name="confirm_phone" form="confirm_pho\
+ne" value="Confirm"/>
+ </div>
+</div>
+
+{% if successfully_confirmed_phone %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#phoneConfirmedModal').modal('show');
+});
+</script>
+{% endif %}
+

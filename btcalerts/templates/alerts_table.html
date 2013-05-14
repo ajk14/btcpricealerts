@@ -1,0 +1,29 @@
+{% load custom_tags %}
+
+<div class="span10 offset1">
+  <h3>Your Active Alerts</h3>
+  <table class="table">
+    <tr>
+      <td><strong>Type</strong></td>
+      <td><strong>Destination</strong></td>
+      <td><strong>Alert When</strong></td>
+      <td><strong>Threshold</strong></td>
+      <td><strong>Delete</strong></td>
+    </tr>
+    {% for alert in myAlerts %}
+    <tr>
+      <td>{{ alert.delivery_type }}</td>
+      <td>
+        {% if alert.delivery_type == "SMS" %}
+        {{ alert.destination|phonenumber }}
+        {% else %}
+        {{ alert.destination }}
+        {% endif %}
+      </td>
+      <td>{{ alert.alert_when }}</td>
+      <td>${{ alert.threshold }}</td>
+      <td><a href="/delete?id={{alert.id}}"><i class="icon-trash"></i></a></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
