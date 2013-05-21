@@ -1,14 +1,14 @@
 {% load custom_tags %}
 
-<div class="span10 offset1">
-  <h3>Your Active Alerts</h3>
+<div class="span7">
+  <h4>Your Active Alerts</h4>
   <table class="table">
     <tr>
-      <td><strong>Type</strong></td>
-      <td><strong>Destination</strong></td>
-      <td><strong>Alert When</strong></td>
-      <td><strong>Threshold</strong></td>
-      <td><strong>Delete</strong></td>
+      <td><h5>Type</h5></td>
+      <td><h5>Destination</h5></td>
+      <td><h5>Alert When</h5></td>
+      <td><h5>Threshold</h5></td>
+      <td><h5>Delete</h5></td>
     </tr>
     {% for alert in myAlerts %}
     <tr>
@@ -27,3 +27,4 @@
     {% endfor %}
   </table>
 </div>
+

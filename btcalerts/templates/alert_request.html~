@@ -1,7 +1,7 @@
 {% load bootstrap_toolkit %}
 {% load custom_tags %}
 
-<div class="span5">
+<div class="span4">
   <form class="form-signin request" action="" method="post">                                   
     <h2 class="form-signin-heading">Request New Alert</h2>                             
     {% csrf_token %}                                                                   

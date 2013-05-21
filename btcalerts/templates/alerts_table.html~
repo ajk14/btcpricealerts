@@ -1,4 +1,6 @@
-<div class="span10 offset1">
+{% load custom_tags %}
+
+<div class="span8">
   <h3>Your Active Alerts</h3>
   <table class="table">
     <tr>
@@ -25,3 +27,4 @@
     {% endfor %}
   </table>
 </div>
+
